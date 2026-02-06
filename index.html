@@ -36,6 +36,62 @@
       letter-spacing: -0.5px;
     }
 
+    .header-section {
+      text-align: center;
+      margin-bottom: 3em;
+      padding-bottom: 2em;
+      border-bottom: 2px solid #e2e8f0;
+    }
+
+    .model-architecture {
+      max-width: 900px;
+      width: 100%;
+      margin: 2em auto;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .links {
+      display: flex;
+      justify-content: center;
+      gap: 1.5em;
+      flex-wrap: wrap;
+      margin-top: 2em;
+    }
+
+    .links a {
+      display: inline-block;
+      padding: 0.7em 1.5em;
+      background: #edf2f7;
+      color: #2d3748;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+    }
+
+    .links a:hover {
+      background: #e2e8f0;
+      border-color: #cbd5e0;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    .links a.disabled {
+      background: #f7fafc;
+      color: #a0aec0;
+      cursor: not-allowed;
+      border: 2px dashed #cbd5e0;
+    }
+
+    .links a.disabled:hover {
+      transform: none;
+      box-shadow: none;
+      background: #f7fafc;
+      border-color: #cbd5e0;
+    }
+
     h2 {
       color: #2d3748;
       font-size: 1.8em;
@@ -128,6 +184,16 @@
         font-size: 1.5em;
       }
 
+      .links {
+        flex-direction: column;
+        gap: 1em;
+      }
+
+      .links a {
+        width: 100%;
+        text-align: center;
+      }
+
       table {
         font-size: 0.9em;
       }
@@ -145,7 +211,18 @@
 <body>
 
 <div class="container">
-  <h1>PTR Audio Examples</h1>
+  <div class="header-section">
+    <h1>PTR Audio Examples</h1>
+
+    <img class="model-architecture" src="/ptr-examples/figures/ptr-model_overview.png" alt="PTR Model Architecture">
+
+    <div class="links">
+      <a href="https://github.com/rdoerfler/ptr-model" target="_blank">Code & Model Weights</a>
+      <a href="https://doi.org/10.5281/zenodo.16883336" target="_blank">Dataset (Zenodo)</a>
+      <a href="https://huggingface.co/datasets/rdoerfler/procedural-engine-sounds" target="_blank">Dataset (Hugging Face)</a>
+      <a href="#" class="disabled">Paper (Coming Soon)</a>
+    </div>
+  </div>
 
   <script>
     // GitHub raw content paths
