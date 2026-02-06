@@ -1,6 +1,6 @@
 # PTR Audio Examples
 
-**Access the interactive examples:** https://rdoerfler.github.io/ptr-examples/
+**Access the interactive examples:** https://rdoerfler.github.io/ptr-model-page/
 
 Please consider listening with headphones.
 
