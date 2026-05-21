@@ -1,326 +1,572 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Pulse-Train-Resonator Model - Audio Examples</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PTR Model — Audio Examples</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg:            #ffffff;
+      --surface:       #f6f6f6;
+      --border:        #e2e2e2;
+      --border-strong: #b8b8b8;
+      --text:          #111111;
+      --text-dim:      #555555;
+      --text-muted:    #999999;
+      --col-target:    #374151;
+      --col-hpn:       #9a3412;
+      --col-ptr:       #1e40af;
+      --mono: 'JetBrains Mono', monospace;
+      --sans: 'Inter', sans-serif;
+      --r: 4px;
+      --max-w: 960px;
     }
 
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-      min-height: 100vh;
-      padding: 2em 1em;
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; line-height: 1.6; }
+
+    /* ── Header ── */
+    header { border-bottom: 1px solid var(--border); padding: 40px 24px 28px; }
+    .header-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    .paper-venue {
+      font-family: var(--mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
     }
 
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 12px;
-      padding: 3em;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-    }
-
-    h1 {
-      color: #2d3748;
-      font-size: 2.5em;
-      margin-bottom: 0.5em;
-      text-align: center;
+    .paper-title {
+      font-size: 26px;
       font-weight: 600;
-      letter-spacing: -0.5px;
+      letter-spacing: -0.02em;
+      line-height: 1.25;
+      margin-bottom: 10px;
+    }
+    .paper-title em { font-style: normal; color: var(--col-ptr); }
+
+    .paper-authors {
+      font-size: 13px;
+      color: var(--text-dim);
+      margin-bottom: 4px;
     }
 
-    .header-section {
-      text-align: center;
-      margin-bottom: 3em;
-      padding-bottom: 2em;
-<!--      border-bottom: 2px solid #e2e8f0;-->
-    }
+    .paper-links { display: flex; gap: 8px; flex-wrap: wrap; }
 
-    .model-architecture {
-      max-width: 900px;
-      width: 100%;
-      margin: 2em auto;
-      display: block;
-    }
-
-    .links {
-      display: flex;
-      justify-content: center;
-      gap: 1.5em;
-      flex-wrap: wrap;
-      margin-top: 2em;
-    }
-
-    .links a {
-      display: inline-block;
-      padding: 0.7em 1.5em;
-      background: #edf2f7;
-      color: #2d3748;
+    .pill {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 12px; font-weight: 500;
+      padding: 4px 13px;
+      border-radius: 100px;
+      border: 1px solid var(--border-strong);
+      color: var(--text);
       text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      transition: all 0.3s ease;
-      border: 2px solid transparent;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .pill:hover { background: var(--surface); border-color: var(--text); }
+    .pill.primary { background: var(--col-ptr); border-color: var(--col-ptr); color: #fff; }
+    .pill.primary:hover { background: #1e3a8a; border-color: #1e3a8a; }
+    .pill.disabled {
+      color: var(--text-muted); border-style: dashed; cursor: not-allowed;
+    }
+    .pill.disabled:hover { background: transparent; border-color: var(--border-strong); }
+
+    /* ── Main ── */
+    main { max-width: var(--max-w); margin: 0 auto; padding: 36px 24px 100px; }
+
+    /* ── Info box ── */
+    .info-box {
+      margin-top: 12px;
+      padding: 14px 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.8;
     }
 
-    .links a:hover {
-      background: #e2e8f0;
-      border-color: #cbd5e0;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    /* ── Model figure ── */
+    .fig-block {
+      margin-bottom: 40px;
+      padding-bottom: 36px;
+      border-bottom: 1px solid var(--border);
     }
-
-    .links a.disabled {
-      background: #f7fafc;
-      color: #a0aec0;
-      cursor: not-allowed;
-      border: 2px dashed #cbd5e0;
+    .fig-label {
+      font-family: var(--mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 10px;
     }
-
-    .links a.disabled:hover {
-      transform: none;
-      box-shadow: none;
-      background: #f7fafc;
-      border-color: #cbd5e0;
-    }
-
-    .section-title {
-      color: #2d3748;
-      font-size: 2em;
-      margin-top: 2em;
-      margin-bottom: 2em;
-      text-align: center;
-      font-weight: 600;
-      padding-top: 1em;
-    }
-
-    h2 {
-      color: #2d3748;
-      font-size: 1.8em;
-      margin-top: 2.5em;
-      margin-bottom: 1em;
-      padding-bottom: 0.5em;
-      border-bottom: 2px solid #cbd5e0;
-      font-weight: 600;
-    }
-
-    h3 {
-      color: #4a5568;
-      font-size: 1.3em;
-      margin-top: 1.5em;
-      margin-bottom: 1em;
-      font-weight: 500;
-    }
-
-    table {
-      border-collapse: collapse;
+    .fig-block img {
       width: 100%;
-      margin-bottom: 3em;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-    }
-
-    th {
-      background: #edf2f7;
-      color: #2d3748;
-      padding: 1em;
-      text-align: center;
-      font-weight: 600;
-      font-size: 1em;
-      border-bottom: 2px solid #cbd5e0;
-    }
-
-    td {
-      border: 1px solid #e2e8f0;
-      padding: 1.5em 1em;
-      text-align: center;
-      background: #ffffff;
-    }
-
-    tr:hover td {
-      background: #f7fafc;
-    }
-
-    td:first-child {
-      font-weight: 600;
-      color: #4a5568;
-      font-size: 1.1em;
-      background: #f7fafc;
-    }
-
-    audio {
-      width: 100%;
-      max-width: 300px;
-      margin-top: 0.8em;
-      outline: none;
-    }
-
-    img.spectrogram {
-      max-width: 100%;
-      width: 300px;
-      height: auto;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
       display: block;
-      margin: 0 auto;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      transition: box-shadow 0.3s ease;
+      cursor: zoom-in;
+      transition: border-color 0.2s;
+    }
+    .fig-block img:hover { border-color: var(--border-strong); }
+    .fig-caption {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--text-dim);
+      line-height: 1.7;
+      text-align: justify;
     }
 
-    img.spectrogram:hover {
-      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    /* ── Examples section ── */
+    .section-intro { margin-bottom: 28px; }
+    .section-intro h2 { font-size: 17px; font-weight: 600; letter-spacing: -0.01em; }
+
+    /* ── Epoch heading ── */
+    .epoch-heading {
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      margin-top: 48px;
+      margin-bottom: 24px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
     }
 
-    /* Responsive design */
-    @media (max-width: 768px) {
-      .container {
-        padding: 1.5em;
-      }
+    /* ── Example block ── */
+    .ex-block { margin-bottom: 52px; }
+    .ex-head {
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 14px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .ex-head h3 { font-family: var(--mono); font-size: 13px; font-weight: 500; }
 
-      h1 {
-        font-size: 1.8em;
-      }
+    /* ── Column headers ── */
+    .col-headers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+    .col-hdr {
+      font-family: var(--mono);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.03em;
+      padding: 2px 4px;
+    }
 
-      .section-title {
-        font-size: 1.6em;
-      }
+    /* ── Row ── */
+    .row-block { margin-bottom: 10px; }
+    .row-idx {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .col-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
 
-      h2 {
-        font-size: 1.5em;
-      }
+    /* ── Cell: spectrogram + player ── */
+    .audio-cell {
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      overflow: hidden;
+      transition: border-color 0.15s;
+    }
+    .audio-cell.playing { border-color: var(--cell-color); }
 
-      .links {
-        flex-direction: column;
-        gap: 1em;
-      }
+    .spec-img {
+      width: 100%;
+      display: block;
+      height: auto;
+      background: var(--surface);
+    }
 
-      .links a {
-        width: 100%;
-        text-align: center;
-      }
+    /* ── Audio player ── */
+    .aw {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 8px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+    .aw-btn {
+      width: 22px; height: 22px; flex-shrink: 0; border-radius: 50%;
+      border: none; cursor: pointer; background: transparent;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform 0.1s, background 0.15s;
+    }
+    .aw-btn:active { transform: scale(0.88); }
+    .aw-btn svg { width: 8px; height: 8px; pointer-events: none; }
+    .aw-wave {
+      flex: 1; height: 20px; cursor: pointer; overflow: hidden;
+      display: flex; align-items: center; gap: 1.5px; min-width: 0;
+    }
+    .aw-bar { flex-shrink: 0; width: 2px; border-radius: 1px; }
+    .aw-time {
+      font-family: var(--mono); font-size: 9px; color: var(--text-muted);
+      min-width: 28px; text-align: right; flex-shrink: 0;
+    }
 
-      table {
-        font-size: 0.9em;
-      }
+    /* ── Now playing bar ── */
+    #now-bar {
+      position: fixed; bottom: 0; left: 0; right: 0; height: 36px;
+      background: var(--bg); border-top: 1px solid var(--border);
+      display: none; align-items: center; padding: 0 24px; gap: 10px; z-index: 100;
+      font-family: var(--mono); font-size: 10px; color: var(--text-dim);
+    }
+    #now-bar.on { display: flex; }
+    #now-label b { color: var(--text); }
+    .pulse {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--col-ptr);
+      animation: pulse 1.2s ease-in-out infinite; flex-shrink: 0;
+    }
+    @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.4;transform:scale(.7)} }
 
-      img.spectrogram {
-        width: 200px;
-      }
+    /* ── Lightbox ── */
+    #lightbox {
+      display: none; position: fixed; inset: 0; z-index: 500;
+      background: rgba(0,0,0,0.8); backdrop-filter: blur(6px);
+      align-items: center; justify-content: center; cursor: zoom-out;
+    }
+    #lightbox.on { display: flex; }
+    #lightbox img { max-width: 92vw; max-height: 92vh; border-radius: var(--r); box-shadow: 0 24px 64px rgba(0,0,0,0.5); }
 
-      audio {
-        max-width: 200px;
-      }
+    @media (max-width: 640px) {
+      .col-grid, .col-headers { grid-template-columns: 1fr; }
+      .paper-title { font-size: 20px; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <div class="header-section">
-    <h1>Pulse-Train-Resonator (PTR) Model</h1>
-
-    <img class="model-architecture" src="https://raw.githubusercontent.com/rdoerfler/ptr-model-page/main/figures/ptr-model_overview.png" alt="PTR Model Architecture">
-
-    <div class="links">
-      <a href="https://github.com/rdoerfler/ptr-model" target="_blank">Code & Model Weights</a>
-      <a href="https://doi.org/10.5281/zenodo.16883336" target="_blank">Dataset (Zenodo)</a>
-      <a href="https://huggingface.co/datasets/rdoerfler/procedural-engine-sounds" target="_blank">Dataset (Hugging Face)</a>
-      <a href="#" class="disabled">Paper (Coming Soon)</a>
+<header>
+  <div class="header-inner">
+    <div class="paper-venue">EUSIPCO 2026 &mdash; 34th European Signal Processing Conference &mdash; Bruges, Belgium &mdash; Aug 31 &ndash; Sep 4, 2026</div>
+    <h1 class="paper-title">Physics-Informed Neural Engine Sound Modeling with <em>Differentiable Pulse-Train Synthesis</em></h1>
+    <div class="paper-authors">Robin Doerfler<sup>1</sup> &middot; Lonce Wyse<sup>2</sup></div>
+    <div class="paper-affiliations" style="font-size:11px;color:var(--text-muted);line-height:1.6;margin-bottom:18px;">
+      <sup>1</sup>Audio Research &amp; Development, Impulse Audio Lab GmbH, Munich, Germany &nbsp;&middot;&nbsp;
+      <sup>2</sup>Music Technology Group, Universitat Pompeu Fabra, Barcelona, Spain
+    </div>
+    <div class="paper-links">
+      <a class="pill primary" href="https://arxiv.org/abs/2603.09391" target="_blank" rel="noopener">
+        <svg viewBox="0 0 14 16" width="11" height="11" fill="currentColor" aria-hidden="true">
+          <path d="M4 0h5.5L14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2zm0 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V5H9.5A1.5 1.5 0 0 1 8 3.5V1H4zm5 0v2.5a.5.5 0 0 0 .5.5H12L9 1z"/>
+        </svg>
+        Paper
+      </a>
+      <a class="pill" href="https://github.com/rdoerfler/ptr-model" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" width="11" height="11" fill="currentColor" aria-hidden="true">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        Code &amp; Weights
+      </a>
+      <a class="pill" href="https://doi.org/10.5281/zenodo.16883336" target="_blank" rel="noopener">Dataset (Zenodo)</a>
+      <a class="pill" href="https://huggingface.co/datasets/rdoerfler/procedural-engine-sounds" target="_blank" rel="noopener">Dataset (HF)</a>
+      <a class="pill" href="#examples">Audio Examples &darr;</a>
     </div>
   </div>
+</header>
 
-<!--  <div class="section-title">Audio Examples</div>-->
-    <div style="display: flex; align-items: center; margin: 0em 0 0em; color: #718096;">
-    <div style="flex: 1; height: 1px; background: #cbd5e0;"></div>
-    <div style="padding: 0 1em; font-size: 1.1em; font-weight: 500;">Audio Examples</div>
-    <div style="flex: 1; height: 1px; background: #cbd5e0;"></div>
+<main>
+  <div class="fig-block">
+    <div class="fig-label">Figure 1 &mdash; Model Overview</div>
+    <img src="figures/ptr-model_overview.png" alt="PTR model overview diagram"
+         onclick="openLightbox(this.src)" title="Click to enlarge" />
+    <p class="fig-caption">
+      Control features (RPM, torque) and their deltas are temporally embedded via MLP blocks and GRU.
+      Outputs are decoded into synth parameters through MLP blocks, converted to parameter ranges by
+      specialized heads (Pulse, Noise), upsampled to audio rate and scaled by conditioning signals.
+      Audio is synthesized via differentiable modules with parameter updates calculated from
+      multi-resolution spectral and harmonic losses.
+    </p>
+  </div>
+
+  <section id="examples">
+    <div class="section-intro">
+      <h2>Audio Examples</h2>
+      <div class="info-box">
+        Three conditions are compared:
+        <strong style="color:var(--col-target)">Target</strong> &mdash; ground-truth engine recordings;
+        <strong style="color:var(--col-hpn)">HPN</strong> &mdash; harmonic-plus-noise baseline (same encoder&ndash;decoder structure but standard harmonic plus noise synthesis); and
+        <strong style="color:var(--col-ptr)">PTR (ours)</strong> &mdash; the proposed Pulse-Train-Resonator model.
+        Spectrograms are shown as visual reference. Click &#9654; to play, or click the waveform to seek.
+      </div>
     </div>
+    <div id="table-area"></div>
+  </section>
+</main>
 
-  <script>
-    // GitHub raw content paths
-    const baseAudioPath = "https://raw.githubusercontent.com/rdoerfler/ptr-model-page/main/audiofiles";
-    const baseSpecPath  = "https://raw.githubusercontent.com/rdoerfler/ptr-model-page/main/spectrograms";
-
-    // Define sequences for each dataset
-    const sequences = {
-      "C": [40, 56, 1, 3, 11, 13, 18, 30],
-      "B": [46, 56, 5, 7, 13, 23, 29, 34],
-      "A": [2, 14, 20, 22, 37, 39, 43, 31]
-    };
-
-    const datasets = ["C", "B", "A"];
-
-    function createRow(seqNum, rowNum, dataset, type) {
-      // audio paths
-      const target = `${baseAudioPath}/HPN/${dataset}/${type}/targets/targets_${seqNum}.mp3`;
-      const hpnPred = `${baseAudioPath}/HPN/${dataset}/${type}/predictions/predictions_${seqNum}.mp3`;
-      const ptrPred = `${baseAudioPath}/PTR/${dataset}/${type}/predictions/predictions_${seqNum}.mp3`;
-
-      // spectrogram paths
-      const targetSpec = `${baseSpecPath}/HPN/${dataset}/${type}/targets/targets_${seqNum}.png`;
-      const hpnSpec = `${baseSpecPath}/HPN/${dataset}/${type}/predictions/predictions_${seqNum}.png`;
-      const ptrSpec = `${baseSpecPath}/PTR/${dataset}/${type}/predictions/predictions_${seqNum}.png`;
-
-      return `
-        <tr>
-          <td>${rowNum}</td>
-          <td>
-            <img class="spectrogram" src="${targetSpec}" alt="Target ${seqNum}">
-            <audio controls><source src="${target}" type="audio/mpeg"></audio>
-          </td>
-          <td>
-            <img class="spectrogram" src="${hpnSpec}" alt="HPN ${seqNum}">
-            <audio controls><source src="${hpnPred}" type="audio/mpeg"></audio>
-          </td>
-          <td>
-            <img class="spectrogram" src="${ptrSpec}" alt="PTR ${seqNum}">
-            <audio controls><source src="${ptrPred}" type="audio/mpeg"></audio>
-          </td>
-        </tr>
-      `;
-    }
-
-    // Best Epoch
-    document.write(`<h2>Best Epoch</h2>`);
-    datasets.forEach(dataset => {
-      document.write(`<h3>Dataset ${dataset}</h3>`);
-      document.write("<table>");
-      document.write("<tr><th>Example</th><th>Target</th><th>HPN</th><th>PTR</th></tr>");
-
-      sequences[dataset].forEach((seqNumRaw, i) => {
-        const seqNum = String(seqNumRaw).padStart(2, "0");
-        const rowNum = i + 1;
-        document.write(createRow(seqNum, rowNum, dataset, "test_inference"));
-      });
-
-      document.write("</table>");
-    });
-
-    // First Epoch
-    document.write(`<h2>First Epoch</h2>`);
-    datasets.forEach(dataset => {
-      document.write(`<h3>Dataset ${dataset}</h3>`);
-      document.write("<table>");
-      document.write("<tr><th>Example</th><th>Target</th><th>HPN</th><th>PTR</th></tr>");
-
-      for (let i = 1; i <= 8; i++) {
-        const seqNum = String(i).padStart(2, "0");
-        const rowNum = i;
-        document.write(createRow(seqNum, rowNum, dataset, "epoch_001"));
-      }
-
-      document.write("</table>");
-    });
-  </script>
+<div id="lightbox" onclick="closeLightbox()">
+  <img id="lb-img" src="" alt="" />
 </div>
 
+<div id="now-bar">
+  <div class="pulse"></div>
+  <div id="now-label">&mdash;</div>
+</div>
+
+<script>
+'use strict';
+
+const USE_RAW_GITHUB  = false;
+const GITHUB_RAW_BASE = 'https://raw.githubusercontent.com/rdoerfler/ptr-model-page/main';
+
+function p(rel) {
+  return USE_RAW_GITHUB ? `${GITHUB_RAW_BASE}/${rel}` : rel;
+}
+
+const COLUMNS = [
+  { key: 'target', label: 'Target',     color: '#374151' },
+  { key: 'hpn',    label: 'HPN',        color: '#9a3412' },
+  { key: 'ptr',    label: 'PTR (ours)',  color: '#1e40af' },
+];
+
+const DATASETS = ['C', 'B', 'A'];
+
+const SEQUENCES = {
+  C: [40, 56, 1, 3, 11, 13, 18, 30],
+  B: [46, 56, 5, 7, 13, 23, 29, 34],
+  A: [2, 14, 20, 22, 37, 39, 43, 31],
+};
+
+const SECTIONS = [
+  { type: 'test_inference', heading: 'Best Epoch', description: '' },
+  { type: 'epoch_001',      heading: 'First Epoch', description:
+    'These examples reveal the initial inductive biases of each synthesis paradigm after just a single epoch of training. ' +
+    'Even before meaningful parameter fitting, <strong style="color:#1e40af">PTR</strong> already produces recognizably engine-like sounds: ' +
+    'the pulse-train structure constrains output to sequential pressure impulses that articulate individual combustion events at low RPM ' +
+    'and merge into dense harmonic textures at higher RPM, while the Karplus\u2013Strong resonators introduce authentic exhaust-pipe resonance characteristics. ' +
+    'The result is a signal that is stable, harmonically plausible, and mechanically coherent from the very start of optimization. ' +
+    '<strong style="color:#9a3412">HPN</strong>, lacking these physics-informed constraints, begins from a less structured initialization\u2014its ' +
+    'harmonic-plus-noise representation must learn the engine\u2019s temporal and spectral regularities entirely from data, producing noisier ' +
+    'and less recognizable outputs at this early stage. ' +
+    'Comparing the two illustrates how domain-specific inductive biases narrow the solution space to physically plausible signals, ' +
+    'giving PTR a substantial head start in perceptual quality.'
+  },
+];
+
+function audioPaths(seqNum, dataset, type) {
+  const s = String(seqNum).padStart(2, '0');
+  return {
+    target: {
+      audio: p(`audiofiles/HPN/${dataset}/${type}/targets/targets_${s}.mp3`),
+      spec:  p(`spectrograms/HPN/${dataset}/${type}/targets/targets_${s}.png`),
+    },
+    hpn: {
+      audio: p(`audiofiles/HPN/${dataset}/${type}/predictions/predictions_${s}.mp3`),
+      spec:  p(`spectrograms/HPN/${dataset}/${type}/predictions/predictions_${s}.png`),
+    },
+    ptr: {
+      audio: p(`audiofiles/PTR/${dataset}/${type}/predictions/predictions_${s}.mp3`),
+      spec:  p(`spectrograms/PTR/${dataset}/${type}/predictions/predictions_${s}.png`),
+    },
+  };
+}
+
+let activeAudio = null, activeWidget = null, activeCell = null;
+
+function render() {
+  const area = document.getElementById('table-area');
+
+  for (const section of SECTIONS) {
+    const sectionHeading = document.createElement('h2');
+    sectionHeading.className = 'epoch-heading';
+    sectionHeading.textContent = section.heading;
+    area.appendChild(sectionHeading);
+
+    if (section.description) {
+      const desc = document.createElement('div');
+      desc.className = 'info-box';
+      desc.style.marginBottom = '28px';
+      desc.innerHTML = section.description;
+      area.appendChild(desc);
+    }
+
+    for (const dataset of DATASETS) {
+      const seqs = section.type === 'test_inference'
+        ? SEQUENCES[dataset]
+        : Array.from({ length: 8 }, (_, i) => i + 1);
+
+      const block = document.createElement('div');
+      block.className = 'ex-block';
+
+      const head = document.createElement('div');
+      head.className = 'ex-head';
+      head.innerHTML = `<h3>Dataset ${esc(dataset)}</h3>`;
+      block.appendChild(head);
+
+      // Column headers
+      const colHeaders = document.createElement('div');
+      colHeaders.className = 'col-headers';
+      for (const col of COLUMNS) {
+        const hdr = document.createElement('div');
+        hdr.className = 'col-hdr';
+        hdr.style.color = col.color;
+        hdr.textContent = col.label;
+        colHeaders.appendChild(hdr);
+      }
+      block.appendChild(colHeaders);
+
+      for (let i = 0; i < seqs.length; i++) {
+        const seqNum = seqs[i];
+        const paths  = audioPaths(seqNum, dataset, section.type);
+        const idx    = String(i + 1).padStart(2, '0');
+
+        const rowBlock = document.createElement('div');
+        rowBlock.className = 'row-block';
+
+        const rowIdx = document.createElement('div');
+        rowIdx.className = 'row-idx';
+        rowIdx.textContent = idx;
+        rowBlock.appendChild(rowIdx);
+
+        const grid = document.createElement('div');
+        grid.className = 'col-grid';
+
+        for (const col of COLUMNS) {
+          const d = paths[col.key];
+          const label = `Dataset ${dataset} / ${col.label} / ${idx}`;
+
+          const cell = document.createElement('div');
+          cell.className = 'audio-cell';
+          cell.style.setProperty('--cell-color', col.color);
+
+          const img = document.createElement('img');
+          img.className = 'spec-img';
+          img.src = d.spec;
+          img.alt = `Spectrogram: ${label}`;
+          img.loading = 'lazy';
+          cell.appendChild(img);
+
+          cell.appendChild(makeWidget(d.audio, col.color, label, cell));
+          grid.appendChild(cell);
+        }
+
+        rowBlock.appendChild(grid);
+        block.appendChild(rowBlock);
+      }
+
+      area.appendChild(block);
+    }
+  }
+}
+
+function makeWidget(url, color, label, cell) {
+  const wrap  = document.createElement('div');
+  wrap.className = 'aw';
+  const BAR_N = 40;
+
+  const btn = document.createElement('button');
+  btn.className = 'aw-btn';
+  btn.innerHTML = svgPlay();
+  btn.style.color = color;
+
+  const waveWrap = document.createElement('div');
+  waveWrap.className = 'aw-wave';
+  const bars = Array.from({ length: BAR_N }, () => {
+    const b = document.createElement('div');
+    b.className = 'aw-bar';
+    b.style.cssText = `background:${color};opacity:0.22;height:${15+Math.random()*85}%`;
+    waveWrap.appendChild(b);
+    return b;
+  });
+
+  const timeEl = document.createElement('div');
+  timeEl.className = 'aw-time';
+  timeEl.textContent = '0:00';
+
+  wrap.append(btn, waveWrap, timeEl);
+
+  const audio = new Audio();
+  audio.preload = 'none';
+  audio.src = url;
+
+  const fmt = s => Math.floor(s/60)+':'+Math.floor(s%60).toString().padStart(2,'0');
+  const updateBars = () => {
+    if (!audio.duration) return;
+    const played = Math.floor((audio.currentTime/audio.duration)*BAR_N);
+    bars.forEach((b,i) => b.style.opacity = i < played ? '0.85' : '0.22');
+    timeEl.textContent = fmt(audio.currentTime);
+  };
+
+  audio.addEventListener('loadedmetadata', () => timeEl.textContent = fmt(audio.duration));
+  audio.addEventListener('timeupdate', updateBars);
+  audio.addEventListener('error', () => { timeEl.textContent = '—'; btn.style.opacity = '0.3'; });
+  audio.addEventListener('ended', () => {
+    btn.innerHTML = svgPlay();
+    cell.classList.remove('playing');
+    bars.forEach(b => b.style.opacity = '0.22');
+    if (audio.duration) timeEl.textContent = fmt(audio.duration);
+    activeAudio = null; activeWidget = null; activeCell = null;
+    setNowPlaying(null);
+  });
+
+  const stopPrev = () => {
+    if (!activeAudio) return;
+    activeAudio.pause();
+    if (activeWidget) activeWidget.querySelector('.aw-btn').innerHTML = svgPlay();
+    if (activeCell)   activeCell.classList.remove('playing');
+  };
+
+  const toggle = () => {
+    if (activeAudio && activeAudio !== audio) stopPrev();
+    if (audio.paused) {
+      audio.play().catch(() => { timeEl.textContent = 'err'; });
+      btn.innerHTML = svgPause();
+      cell.classList.add('playing');
+      activeAudio = audio; activeWidget = wrap; activeCell = cell;
+      setNowPlaying(label);
+    } else {
+      audio.pause(); btn.innerHTML = svgPlay();
+      cell.classList.remove('playing');
+      activeAudio = null; activeWidget = null; activeCell = null;
+      setNowPlaying(null);
+    }
+  };
+
+  btn.addEventListener('click', toggle);
+  waveWrap.addEventListener('click', e => {
+    if (!audio.duration) { toggle(); return; }
+    const r = waveWrap.getBoundingClientRect();
+    audio.currentTime = ((e.clientX-r.left)/r.width)*audio.duration;
+    updateBars();
+  });
+
+  return wrap;
+}
+
+function openLightbox(src) {
+  document.getElementById('lb-img').src = src;
+  document.getElementById('lightbox').classList.add('on');
+}
+function closeLightbox() { document.getElementById('lightbox').classList.remove('on'); }
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });
+
+function setNowPlaying(label) {
+  const bar = document.getElementById('now-bar');
+  const lbl = document.getElementById('now-label');
+  if (label) {
+    const parts = label.split(' / ');
+    lbl.innerHTML = `<b>${esc(parts[0])}</b> &nbsp;/&nbsp; ${esc(parts[1])} &nbsp;/&nbsp; ${esc(parts[2]||'')}`;
+    bar.classList.add('on');
+  } else { bar.classList.remove('on'); }
+}
+
+function svgPlay()  { return `<svg viewBox="0 0 10 10" fill="currentColor"><polygon points="2,1 9,5 2,9"/></svg>`; }
+function svgPause() { return `<svg viewBox="0 0 10 10" fill="currentColor"><rect x="1" y="1" width="3" height="8" rx=".8"/><rect x="6" y="1" width="3" height="8" rx=".8"/></svg>`; }
+function esc(s)     { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+render();
+</script>
 </body>
 </html>
