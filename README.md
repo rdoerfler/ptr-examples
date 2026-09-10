@@ -2,6 +2,8 @@
 
 **Access the interactive examples:** https://rdoerfler.github.io/ptr-model-page/
 
+**Paper:** [Physics-Informed Neural Engine Sound Modeling with Differentiable Pulse-Train Synthesis](https://eurasip.org/Proceedings/Eusipco/Eusipco2026/pdfs/0000076.pdf), EUSIPCO 2026, pp. 76-80 (preprint: [arXiv:2603.09391](https://arxiv.org/abs/2603.09391))
+
 Please consider listening with headphones.
 
 **Note:** All audio examples are direct network outputs without post-processing. For easier comparison and better audibility, they have been normalized to 0dBFS on this webpage.
@@ -31,6 +33,23 @@ The examples include:
 - **First Predictions**: Validation set using first-epoch models, revealing each architecture's inherent acoustic biases before learned data patterns take over
 
 All examples represent unseen data, ensuring unbiased evaluation.
+
+## Citation
+
+```bibtex
+@inproceedings{doerflerPhysicsInformedNeuralEngine2026,
+  title     = {Physics-{{Informed Neural Engine Sound Modeling}} with {{Differentiable Pulse-Train Synthesis}}},
+  author    = {Doerfler, Robin and Wyse, Lonce},
+  booktitle = {Proc. 34th Eur. Signal Process. Conf. (EUSIPCO)},
+  address   = {Bruges, Belgium},
+  publisher = {EURASIP},
+  month     = sep,
+  year      = {2026},
+  pages     = {76--80},
+  isbn      = {978-94-645936-3-1},
+  url       = {https://eurasip.org/Proceedings/Eusipco/Eusipco2026/pdfs/0000076.pdf}
+}
+```
 
 ## References
 
